@@ -10,7 +10,7 @@ function main()
     var near = 1;
     var far = 1000;
     var camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
-    camera.position.set( 0, 0, 7 );
+    camera.position.set( 0, 0, 6 );
     scene.add( camera );
 
     var renderer = new THREE.WebGLRenderer();
@@ -29,18 +29,18 @@ function main()
     ];
 
     var faces = [
-	[0,2,1],//f0: v0-v1-v2
-	[0,2,1],//f1: v0-v1-v
-	[0,2,1],//f2: v0-v1-v
-	[0,1,2],//f3: v0-v1-v
-	[0,1,2],//f4: v0-v1-v
-	[0,1,2],//f5: v0-v1-v
-	[0,1,2],//f6: v0-v1-v
-	[0,1,2],//f7: v0-v1-v
-	[0,1,2],//f8: v0-v1-v
-	[0,2,1],//f9: v0-v1-v
-	[0,2,1],//f10:v0-v1-v
-	[0,2,1] //f11:v0-v1-v
+	[0,1,2],//f0: v0-v1-v2
+	[0,1,2],//f1: v0-v1-v
+	[0,1,2],//f2: v0-v1-v
+	[0,2,1],//f3: v0-v1-v
+	[0,2,1],//f4: v0-v1-v
+	[0,2,1],//f5: v0-v1-v
+	[0,2,1],//f6: v0-v1-v
+	[0,2,1],//f7: v0-v1-v
+	[0,2,1],//f8: v0-v1-v
+	[0,1,2],//f9: v0-v1-v
+	[0,1,2],//f10:v0-v1-v
+	[0,1,2] //f11:v0-v1-v
     ];
 
     var v = [];
@@ -126,27 +126,26 @@ function main()
     //scene.add( cube );
     material.vertexColors = THREE.FaceColors;
     for(i=0;i<12;i++)
-	geometry[i].faces[0].color = new THREE.Color( 1, 0, 0 );
+    geometry[i].faces.color = new THREE.Color( 1, 0, 0 );
 
-    var material = new THREE.MeshBasicMaterial();
-    material.vertexColors = THREE.VertexColors;
-
+    //material.vertexColors = THREE.VertexColors;
+    //for(i=0;i<12;i++){
+    //	geometry[i].faces[0].vertexColors.push(new THREE.Color(1,0,0));
+    //	geometry[i].faces[0].vertexColors.push(new THREE.Color(0,1,0));
+    //	geometry[i].faces[0].vertexColors.push(new THREE.Color(0,0,1));
+    //}
+    var triangle = [];
     for(i=0;i<12;i++){
-	geometry[i].faces[0].vertexColors.push(new THREE.Color(1,0,0));
-	geometry[i].faces[0].vertexColors.push(new THREE.Color(0,1,0));
-	geometry[i].faces[0].vertexColors.push(new THREE.Color(0,0,1));
+	triangle.push( new THREE.Mesh( geometry[i], material ));
+	scene.add( triangle[i] );
     }
-    var cube = [];
-    for(i=0;i<12;i++){
-	cube.push( new THREE.Mesh( geometry[i], material ));
-	scene.add( cube[i] );
-    }
-    
     var light = new THREE.PointLight( 0xffffff );
     light.position.set(1,1,1);
     scene.add(light);
     
-    material.side = THREE.DoubleSide;
+    //material.side = THREE.DoubleSide;
+
+    document.addEventListener( 'mousedown', mouse_down_event );
 
     loop();
 
@@ -154,9 +153,40 @@ function main()
     {
         requestAnimationFrame( loop );
 	for(i=0;i<12;i++){
-	    cube[i].rotation.x += 0.003;
-	    cube[i].rotation.y += 0.003;
+	    triangle[i].rotation.x += 0.008;
+	    triangle[i].rotation.y += 0.008;
 	}
         renderer.render( scene, camera );
     }
+
+    function mouse_down_event( event )
+    {
+	var x_win = event.clientX;
+	var y_win = event.clientY;
+	
+	var vx = renderer.domElement.offsetLeft;
+	var vy = renderer.domElement.offsetTop;
+	var vw = renderer.domElement.width;
+	var vh = renderer.domElement.height;
+
+	var x_NDC = 2 * ( x_win - vx ) / vw - 1;
+	var y_NDC = -( 2 * ( y_win - vy ) / vh - 1 );
+	
+	var p_NDC = new THREE.Vector3( x_NDC, y_NDC, 1 );
+	var p_wld = p_NDC.unproject( camera );
+	
+	var origin = camera.position;
+	var direction = p_wld.sub( camera.position ).normalize();
+	
+	var raycaster = new THREE.Raycaster( origin, direction );
+	for(i=0;i<12;i++){
+        var intersects = raycaster.intersectObject( triangle[i] );
+	if ( intersects.length > 0 )
+	    {
+		intersects[0].face.color.setRGB( 1, 0, 0 );
+		intersects[0].object.geometry.colorsNeedUpdate = true;
+	    }
+	}
+    }
+
 }
