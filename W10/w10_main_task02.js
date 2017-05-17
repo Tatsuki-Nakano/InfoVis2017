@@ -39,6 +39,7 @@ function main()
 
     // Create color map
     var cmap = [];
+/*
     for ( var i = 0; i < 256; i++ )
     {
         var S = i / 255.0; // [0,1]
@@ -46,7 +47,17 @@ function main()
         var G = Math.max( Math.cos( ( S - 0.5 ) * Math.PI ), 0.0 );
         var B = Math.max( Math.cos( S * Math.PI ), 0.0 );
         var color = new THREE.Color( R, G, B );
-	cmap.push( [ S, '0x' + color.getHexString() ] );
+        cmap.push( [ S, '0x' + color.getHexString() ] );
+    }
+*/
+    for ( var i = 0; i < 256; i++ )
+    {
+        var S = i / 255.0; // [0,1]
+        var R = 1.0
+        var G = Math.max( 0.5 * Math.sin( ( S + 0.5 ) * Math.PI ) + 0.5, 0.0 );
+        var B = Math.max( 0.5 * Math.sin( ( S + 0.5 ) * Math.PI ) + 0.5, 0.0 );
+        var color = new THREE.Color( R, G, B );
+        cmap.push( [ S, '0x' + color.getHexString() ] );
     }
 
     // Draw color map
@@ -80,7 +91,7 @@ function main()
     // Assign colors for each vertex
     material.vertexColors = THREE.VertexColors;
     for ( var i = 0; i < nfaces; i++ )
-/*    {
+    {
         var id = faces[i];
         var S0 = scalars[ id[0] ];
         var S1 = scalars[ id[1] ];
@@ -92,8 +103,7 @@ function main()
         geometry.faces[i].vertexColors.push( C1 );
         geometry.faces[i].vertexColors.push( C2 );
     }
-*/
-	
+
     var triangle = new THREE.Mesh( geometry, material );
     scene.add( triangle );
 
