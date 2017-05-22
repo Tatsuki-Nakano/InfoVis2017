@@ -82,8 +82,8 @@ function main()
 
         var x0 = 0.1;
         var x1 = 0.8;
-        //var S0 = 0.0;
-        //var S1 = 255.0;
+        var S0 = 0.0;
+        var S1 = 255.0;
 
     for ( var j = 0; j < nfaces; j++ )
     {
@@ -98,7 +98,7 @@ function main()
 	    { 
 		var xi = S[k];
 		var t = ( xi - x0 ) / ( x1 - x0 );
-		//var Si = ( 1.0 - t ) * S0 + t * S1;
+		var Si = ( 1.0 - t ) * S0 + t * S1;
       		var Ri = Math.max( Math.cos( ( t - 1.0 ) * Math.PI ), 0.0 );
 		var Gi = Math.max( Math.cos( ( t - 0.5 ) * Math.PI ), 0.0 );
 		var Bi = Math.max( Math.cos( t * Math.PI ), 0.0 );
