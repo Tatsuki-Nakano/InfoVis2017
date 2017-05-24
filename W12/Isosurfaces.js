@@ -3,6 +3,10 @@ function Isosurfaces( volume, isovalue )
     var geometry = new THREE.Geometry();
     var material = new THREE.MeshLambertMaterial();
 
+    material.vertexColors = THREE.VertexColors;
+    var x0 = 0.1;
+    var x1 = 0.8;
+    
     var smin = volume.min_value;
     var smax = volume.max_value;
     isovalue = KVS.Clamp( isovalue, smin, smax );
@@ -54,6 +58,63 @@ function Isosurfaces( volume, isovalue )
                     var id2 = counter++;
                     geometry.faces.push( new THREE.Face3( id0, id1, id2 ) );
                 }
+                var c = [];
+
+		for ( var k = 0; k < 3; k++ )
+		{
+		    var xi = S[k];
+		    var t = ( xi - x0 ) / ( x1 - x0 );
+		    //var Si = ( 1.0 - t ) * S0 + t * S1;
+		    //var Ri = Math.max( Math.cos( ( t - 1.0 ) * Math.PI ), 0.0 );
+		    var Ri = 1.0;
+		    //var Gi = Math.max( Math.cos( ( t - 0.5 ) * Math.PI ), 0.0 );
+		    var Gi = Math.max( 0.5 * Math.sin( ( t + 0.5 ) * Math.PI ) + 0.5, 0.0 );
+		    //var Bi = Math.max( Math.cos( t * Math.PI ), 0.0 );
+		    var Bi = Math.max( 0.5 * Math.sin( ( t + 0.5 ) * Math.PI ) + 0.5, 0.0 );
+		    var colori = new THREE.Color( Ri, Gi, Bi );
+		    c.push( '0x' + colori.getHexString() );
+		}
+
+		var C0 = new THREE.Color().setHex( c[ 0 ] );
+		var C1 = new THREE.Color().setHex( c[ 1 ] );
+		var C2 = new THREE.Color().setHex( c[ 2 ] );
+		geometry.faces[j].vertexColors.push( C0 );
+		geometry.faces[j].vertexColors.push( C1 );
+		geometry.faces[j].vertexColors.push( C2 );
+		
+	/*	for ( var j = 0; j < nfaces; j++ )
+		{
+		    var id = faces[j];
+		    var S = [];
+		    for ( var k = 0; k < 3; k++ )
+		    { S.push( scalars[ id[k] ] ); }
+
+		    var c = [];
+
+		    for ( var k = 0; k < 3; k++ )
+		    {
+			var xi = S[k];
+			var t = ( xi - x0 ) / ( x1 - x0 );
+			//var Si = ( 1.0 - t ) * S0 + t * S1;
+			//var Ri = Math.max( Math.cos( ( t - 1.0 ) * Math.PI ), 0.0 );
+			var Ri = 1.0;
+			//var Gi = Math.max( Math.cos( ( t - 0.5 ) * Math.PI ), 0.0 );
+			var Gi = Math.max( 0.5 * Math.sin( ( t + 0.5 ) * Math.PI ) + 0.5, 0.0 );
+			//var Bi = Math.max( Math.cos( t * Math.PI ), 0.0 );
+			var Bi = Math.max( 0.5 * Math.sin( ( t + 0.5 ) * Math.PI ) + 0.5, 0.0 );
+			var colori = new THREE.Color( Ri, Gi, Bi );
+			c.push( '0x' + colori.getHexString() );
+		    }
+
+		    var C0 = new THREE.Color().setHex( c[ 0 ] );
+		    var C1 = new THREE.Color().setHex( c[ 1 ] );
+		    var C2 = new THREE.Color().setHex( c[ 2 ] );
+		    geometry.faces[j].vertexColors.push( C0 );
+		    geometry.faces[j].vertexColors.push( C1 );
+		    geometry.faces[j].vertexColors.push( C2 );
+		}
+	*/	
+		
             }
             cell_index++;
         }
@@ -62,7 +123,7 @@ function Isosurfaces( volume, isovalue )
 
     geometry.computeVertexNormals();
 
-    material.color = new THREE.Color( "white" );
+//    material.color = new THREE.Color( "white" );
 
     return new THREE.Mesh( geometry, material );
 
