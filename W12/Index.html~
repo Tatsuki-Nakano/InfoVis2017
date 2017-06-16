@@ -1,6 +1,6 @@
 <html>
     <head>
-	<title>W12: Task 03</title>
+	<title>W12: Task Last</title>
     </head>
     <body style="margin:0">
 	<script src="three.min.js"></script>
@@ -10,10 +10,12 @@
         <script src="KVS2THREE.min.js"></script>
         <script src="KVSLobsterData.js"></script>
 	<script src="Bounds.js"></script>
-	<script src="Isosurfaces_3.js"></script>
+	<script src="Isosurfaces_last.js"></script>
 	<script src="main_last.js"></script>
-	<script type="text/javascript" src="dat.gui.min.js"></script>
-	
+	<script src="dat.gui.min.js"></script>
+
+	<textarea cols=100 rows=50 id="debug"></textarea>
+
 	<script type="x-shader/x-vertex" id="phong.vert">
 	 varying vec3 point_color;
 	 varying vec4 point_position;

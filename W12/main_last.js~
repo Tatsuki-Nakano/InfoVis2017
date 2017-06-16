@@ -2,77 +2,107 @@ function main()
 {
     var volume = new KVS.LobsterData();
     var screen = new KVS.THREEScreen();
-
+    
     screen.init( volume, {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        enableAutoResize: false
-    });
-
+	    width: window.innerWidth,
+		height: window.innerHeight,
+		enableAutoResize: false
+		});
+    
     var bounds = Bounds( volume );
     screen.scene.add( bounds );
-    var guiControls = new function() {
-                                        //this.model = 'foot';
-                                        //this.steps = 256.0;
-                                        //this.alphaCorrection = 1.0;
-                                        //this.color1 = "#00FA58";
-                                        //this.stepPos1 = 0.1;
-                                        //this.color2 = "#CC6600";
-                                        //this.stepPos2 = 0.7;
-                                        //this.color3 = "#F2F200";
-                                        //this.stepPos3 = 1.0;
-    this.message = 'dat.gui';
-    this.isovalue = 128;
-    this.displayOutline = false;
-    this.explode = function(){};
-                                };    
     
-    var iso = 1;
+    var control = function() {
+	this.message = 'surface1';
+	this.isovalue = 20;
+	this.color = "#ff1e00";
+	this.opacity = 0.1;
+    };  
     
+    var guiControls1 = new control();
+    var guiControls2 = new control();
+   
+    guiControls2.message = 'surface2';
+    guiControls2.isovalue = 200;
+    guiControls2.color = "#29b98e";
+    guiControls2.opacity = 0.8;
+
     var gui = new dat.GUI();
-    gui.add(guiControls, 'message');
-    var aaa = gui.add(guiControls, 'isovalue', 0, 255);
-    gui.add(guiControls, 'displayOutline');
-    gui.add(guiControls, 'explode');
-    //aaa.onChange(function(value){})
-    //screen.scene.add(gui);
-    iso = Math.round(guiControls.isovalue);
-    DebugPrint(iso+1);
-    var surfaces = Isosurfaces( volume, iso, screen );
-    screen.scene.add( surfaces );
+
+
+    gui.add(guiControls1, 'message');
+    var isoControl1 = gui.add(guiControls1, 'isovalue', 0, 255).step(1);
+    var colorControl1 = gui.addColor(guiControls1, 'color');
+    var opacityControl1 = gui.add(guiControls1, 'opacity', 0, 1);
+
+    gui.add(guiControls2, 'message');
+    var isoControl2 = gui.add(guiControls2, 'isovalue', 0, 255).step(1);
+    var colorControl2 = gui.addColor(guiControls2, 'color');
+    var opacityControl2 = gui.add(guiControls2, 'opacity', 0, 1);    
+
+
+    var iso1 = guiControls1.isovalue;
+    var materialcolor1 = new THREE.Color().setHex( guiControls1.color.replace(/#/g, '0x') );
+    var opacity1 = guiControls1.opacity;
+
+    var iso2 = guiControls2.isovalue;
+    var materialcolor2 = new THREE.Color().setHex( guiControls2.color.replace(/#/g, '0x') );
+    var opacity2 = guiControls2.opacity;
+
+
+    var surfaces1 = Isosurfaces( volume, iso1, screen, materialcolor1, opacity1 );
+    screen.scene.add( surfaces1 );
+
+    var surfaces2 = Isosurfaces( volume, iso2, screen, materialcolor2, opacity2 );
+    screen.scene.add( surfaces2 );
+    
+    
+    isoControl1.onChange(function() {
+	    iso1 = guiControls1.isovalue;
+	}
+	);
+    colorControl1.onChange(function() {
+	    materialcolor1 = new THREE.Color().setHex( guiControls1.color.replace(/#/g, '0x') );
+	}
+	);
+    opacityControl1.onChange(function() {
+            opacity1 = guiControls1.opacity;
+        }
+        );
+    
+    isoControl2.onChange(function() {
+            iso2 = guiControls2.isovalue;
+        }
+        );
+    colorControl2.onChange(function() {
+            materialcolor2 = new THREE.Color().setHex( guiControls2.color.replace(/#/g, '0x') );
+        }
+        );
+    opacityControl2.onChange(function() {
+            opacity2 = guiControls2.opacity;
+        }
+        );
+    
+    function update()
+    {
+	screen.scene.remove( surfaces1 );
+	surfaces1 = Isosurfaces( volume, iso1, screen, materialcolor1, opacity1 );
+	screen.scene.add( surfaces1 );
+	screen.scene.remove( surfaces2 );
+	surfaces2 = Isosurfaces( volume, iso2, screen, materialcolor2, opacity2 );
+	screen.scene.add( surfaces2 );
+    }
 
     document.addEventListener( 'mousemove', function() {
-        screen.light.position.copy( screen.camera.position );
-    });
-
+	    screen.light.position.copy( screen.camera.position );
+	});
+    
     window.addEventListener( 'resize', function() {
-        screen.resize( [ window.innerWidth, window.innerHeight ] );
-    });
-
+	    screen.resize( [ window.innerWidth, window.innerHeight ] );
+	});
+    
+    
+    screen.loop();
     
 
- 
-    screen.loop();
-       
-   function setIsovalue()
-   {
-       iso = Math.round(guiControls.isovalue);
-       //DebugPrint(iso);
-       var surfaces = Isosurfaces( volume, iso, screen );
-       screen.scene.add( surfaces );
-   }
-}
-
-function DebugPrint(str)
-{
-    var out = document.getElementById("debug");
-    if (!out) return;
-    out.value += str;
-}
-
-function loop()
-{
-    requestAnimationFrame(loop);
-    //update();
-    screen.loop();
 }
